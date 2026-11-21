@@ -38,7 +38,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m venv .venv
-          .venv/bin/pip install -q pytest
+          .venv/bin/pip install -q pytest pyyaml
 
       - name: Run skill validation (Hermes HARDLINE)
         run: |
@@ -68,7 +68,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m venv .venv
-          .venv/bin/pip install -q pytest
+          .venv/bin/pip install -q pytest pyyaml
 
       - name: Run tests
         run: |
