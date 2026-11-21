@@ -185,7 +185,7 @@ jobs:
             echo "No markdown files changed"
             exit 0
           fi
-          npx markdownlint-cli2 $changed_files --config .markdownlint.json
+          npx markdownlint-cli2 "$changed_files" --config .markdownlint.json
 
   yaml-lint:
     name: YAML Lint
