@@ -33,7 +33,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # v5.5.0
         with:
-          python-version: "3.12"
+          python-version: '3.12'
 
       - name: Install dependencies
         run: |
@@ -63,7 +63,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # v5.5.0
         with:
-          python-version: "3.12"
+          python-version: '3.12'
 
       - name: Install dependencies
         run: |
@@ -87,19 +87,41 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: "20"
+          node-version: '22'
 
       - name: Install commitlint
         run: |
-          npm ci --prefix=.github/commitlint 2>/dev/null || npm install --prefix=.github/commitlint @commitlint/cli @commitlint/config-conventional
+          npm ci 2>/dev/null || npm install @commitlint/cli @commitlint/config-conventional @gitmoji/parser-opts @gitmoji/commit-types commitlint-plugin-gitmoji
 
       - name: Validate PR title
         run: |
-          npx --prefix=.github/commitlint commitlint --edit <<< "${{ github.event.pull_request.title }}"
+          npx commitlint --edit <<< "${{ github.event.pull_request.title }}"
 
       - name: Validate commit messages
         run: |
-          npx --prefix=.github/commitlint commitlint --from=origin/main --to=HEAD
+          npx commitlint --from=origin/main --to=HEAD
+
+  branch-name:
+    name: Branch Name Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Validate branch name follows Conventional Branch format
+        run: |
+          branch="${{ github.head_ref }}"
+          # Allow trunk branches
+          if echo "$branch" | grep -qE '^(master|main|develop)$'; then
+            exit 0
+          fi
+          # Feature branches must follow Conventional Branch format
+          # Types: feat, feature, fix, bugfix, hotfix, release, chore, docs, refactor, perf, test, build, ci, a11y, security, ai, claude, codex, copilot, cursor
+          if ! echo "$branch" | grep -qE '^(feat|feature|fix|bugfix|hotfix|release|chore|docs|refactor|perf|test|build|ci|a11y|security|ai|claude|codex|copilot|cursor)/[a-z0-9-]+$'; then
+            echo "ERROR: Branch name '$branch' does not follow Conventional Branch format"
+            echo "Expected: <type>/<short-description> (or master/main/develop for trunk)"
+            echo "Types: feat, feature, fix, bugfix, hotfix, release, chore, docs, refactor, perf, test, build, ci, a11y, security, ai, claude, codex, copilot, cursor"
+            exit 1
+          fi
 
   security:
     name: Security Scanning
@@ -130,7 +152,7 @@ jobs:
       - name: Run markdownlint
         uses: docker://docker.io/davidanson/markdownlint-cli2:0.16.0
         with:
-          args: "**/*.md"
+          args: '**/*.md'
         env:
           MARKDOWNLINT_CONFIG: .markdownlint.json
 
@@ -167,6 +189,7 @@ jobs:
       - validate-skills
       - test
       - commitlint
+      - branch-name
       - security
       - markdown-lint
       - yaml-lint
@@ -179,10 +202,9 @@ jobs:
           if [[ "${{ needs.validate-skills.result }}" != "success" ]]; then exit 1; fi
           if [[ "${{ needs.test.result }}" != "success" ]]; then exit 1; fi
           if [[ "${{ needs.commitlint.result }}" != "success" ]]; then exit 1; fi
+          if [[ "${{ needs.branch-name.result }}" != "success" ]]; then exit 1; fi
           if [[ "${{ needs.security.result }}" != "success" ]]; then exit 1; fi
           if [[ "${{ needs.markdown-lint.result }}" != "success" ]]; then exit 1; fi
           if [[ "${{ needs.yaml-lint.result }}" != "success" ]]; then exit 1; fi
           if [[ "${{ needs.validate-workflow.result }}" != "success" ]]; then exit 1; fi
           echo "All checks passed"
-
-...

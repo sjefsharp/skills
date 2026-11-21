@@ -1,0 +1,28 @@
+{
+  "name": "hermes-skills",
+  "version": "0.0.1",
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "prepare": "lefthook install",
+    "lint": "prettier --check . && markdownlint . && yamllint .",
+    "format": "prettier --write .",
+    "validate:skills": "python scripts/validate-skills.py --all",
+    "test": "python -m pytest tests/ -q"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
+    "@gitmoji/commit-types": "^1.1.5",
+    "@gitmoji/parser-opts": "^1.4.0",
+    "commitlint-plugin-gitmoji": "^2.2.6",
+    "jsonlint": "^1.6.3",
+    "lefthook": "^2.2.2",
+    "markdownlint-cli": "^0.50.0",
+    "prettier": "^3.10.1",
+    "prettier-plugin-toml": "^2.0.0",
+    "yaml": "^2.9.1"
+  }
+}
