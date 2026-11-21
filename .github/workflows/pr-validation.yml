@@ -116,9 +116,10 @@ jobs:
           fi
           # Feature branches must follow Conventional Branch format
           # Types: feat, feature, fix, bugfix, hotfix, release, chore, docs, refactor, perf, test, build, ci, a11y, security, ai, claude, codex, copilot, cursor
-          if ! echo "$branch" | grep -qE '^(feat|feature|fix|bugfix|hotfix|release|chore|docs|refactor|perf|test|build|ci|a11y|security|ai|claude|codex|copilot|cursor)/[a-z0-9-]+$'; then
+          # Allow nested paths like feat/software-development/skill-lint
+          if ! echo "$branch" | grep -qE '^(feat|feature|fix|bugfix|hotfix|release|chore|docs|refactor|perf|test|build|ci|a11y|security|ai|claude|codex|copilot|cursor)(\/[a-z0-9-]+)+$'; then
             echo "ERROR: Branch name '$branch' does not follow Conventional Branch format"
-            echo "Expected: <type>/<short-description> (or master/main/develop for trunk)"
+            echo "Expected: <type>/<category>/<short-description> (or master/main/develop for trunk)"
             echo "Types: feat, feature, fix, bugfix, hotfix, release, chore, docs, refactor, perf, test, build, ci, a11y, security, ai, claude, codex, copilot, cursor"
             exit 1
           fi
