@@ -1,0 +1,52 @@
+# Gitleaks Configuration
+# https://github.com/gitleaks/gitleaks
+
+[extend]
+# Use default ruleset
+useDefault = true
+
+[allowlist]
+description = "Allowlisted patterns for this repository"
+paths = [
+  "(?i)^.*\\.md$",
+  "(?i)^.*\\.json$",
+  "(?i)^.*\\.yaml$",
+  "(?i)^.*\\.yml$",
+  "(?i)^.*\\.toml$",
+  "(?i)^.*\\.lock$",
+  "(?i)^.*\\.txt$",
+  "(?i)^.*\\.gitignore$",
+  "(?i)^.*\\.gitattributes$",
+  "(?i)^.*\\.editorconfig$",
+  "(?i)^CHANGELOG\\.md$",
+  "(?i)^LICENSE$",
+  "(?i)^README\\.md$",
+  "(?i)^TODO\\.md$",
+  "(?i)^VERSION$",
+  "(?i)^release-please-config\\.json$",
+  "(?i)^\\.release-please-manifest\\.json$",
+  "(?i)^\\.markdownlint\\.json$",
+  "(?i)^\\.yamllint\\.yml$",
+  "(?i)^\\.gitleaks\\.toml$",
+  "(?i)^\\.editorconfig$",
+  "(?i)^\\.prettierrc\\.json$",
+  "(?i)^commitlint\\.config\\.cjs$",
+  "(?i)^lefthook\\.yml$",
+  "(?i)^package\\.json$",
+  "(?i)^pnpm-lock\\.yaml$",
+  "(?i)^\\.github/.*",
+  "(?i)^scripts/.*",
+  "(?i)^tests/.*",
+  "(?i)^references/.*",
+  "(?i)^skills/.*",
+  "(?i)^optional-skills/.*",
+  "(?i)^assets/.*",
+]
+
+# Allow specific keys in config files
+regexes = [
+  # Allow placeholder values
+  '''(?i)(REPLACE_WITH|PLACEHOLDER|YOUR_|EXAMPLE_|DUMMY_|TEST_)''',
+  # Allow localhost and example URLs
+  '''(?i)(localhost|127\\.0\\.0\\.1|example\\.com|example\\.org|test\\.com)''',
+]

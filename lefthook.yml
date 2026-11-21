@@ -1,0 +1,69 @@
+# Lefthook Configuration
+# https://lefthook.dev/configuration/
+
+# Run staged files through formatters and linters
+pre-commit:
+  parallel: true
+  jobs:
+    - name: prettier
+      glob: '*.{md,json,yaml,yml,toml}'
+      run: |
+        files=$(echo "{staged_files}" | tr ' ' '\n' | grep -E '\.(md|json|yaml|yml|toml)$' | tr '\n' ' ')
+        echo "Prettier checking: $files"
+        if [ -n "$files" ]; then
+          npx prettier --check --no-cache $files
+        fi
+      stage_fixed: true
+
+    - name: markdownlint
+      glob: '*.md'
+      run: npx markdownlint {staged_files}
+      stage_fixed: true
+
+    - name: json-lint
+      glob: '*.{json,jsonc}'
+      run: npx jsonlint {staged_files}
+      stage_fixed: true
+
+    - name: conflict-markers
+      run: |
+        if git diff --cached --name-only | xargs grep -l "^<<<<<<< " 2>/dev/null; then
+          echo "ERROR: Conflict markers found in staged files"
+          exit 1
+        fi
+      stage_fixed: false
+
+# Validate commit message format
+commit-msg:
+  jobs:
+    - name: commitlint
+      run: npx commitlint --edit {1}
+
+# Pre-push validation
+pre-push:
+  jobs:
+    - name: validate-skills
+      run: python scripts/validate-skills.py --all
+      stage_fixed: false
+
+    - name: tests
+      run: .venv/bin/python -m pytest tests/ -q
+      stage_fixed: false
+
+    - name: branch-name
+      run: |
+        branch=$(git rev-parse --abbrev-ref HEAD)
+        # Allow trunk branches (master, main, develop)
+        if echo "$branch" | grep -qE '^(master|main|develop)$'; then
+          exit 0
+        fi
+        # Feature branches must follow Conventional Branch format
+        # Types: feature/feat, bugfix/fix, hotfix, release, chore, ai/claude/codex/copilot/cursor
+        # Allow nested paths like feat/software-development/skill-lint
+        if ! echo "$branch" | grep -qE '^(feat|feature|fix|bugfix|hotfix|release|chore|docs|refactor|perf|test|build|ci|a11y|security|ai|claude|codex|copilot|cursor)(\/[a-z0-9-]+)+$'; then
+          echo "ERROR: Branch name '$branch' does not follow Conventional Branch format"
+          echo "Expected: <type>/<category>/<short-description> (or master/main/develop for trunk)"
+          echo "Types: feat, feature, fix, bugfix, hotfix, release, chore, docs, refactor, perf, test, build, ci, a11y, security, ai, claude, codex, copilot, cursor"
+          exit 1
+        fi
+      stage_fixed: false
