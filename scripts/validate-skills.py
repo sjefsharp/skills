@@ -4,11 +4,14 @@ Skill Frontmatter & Structure Validator
 
 Validates a SKILL.md file against the Hermes Agent Skill Authoring Standards.
 Run from repo root: python3 scripts/validate-skills.py skills/<category>/<skill>/SKILL.md
+
+Also supports official Agent Skills spec validation via skills-ref (if installed).
 """
 
 import sys
 import re
 import yaml
+import subprocess
 from pathlib import Path
 from typing import List, Tuple
 
@@ -18,11 +21,13 @@ MAX_CONTENT_CHARS = 100_000
 
 VALID_PLATFORMS = {"linux", "macos", "windows"}
 REQUIRED_FIELDS = {"name", "description", "version", "author", "license", "platforms"}
-REQUIRED_METADATA = {"hermes.tags", "hermes.related_skills"}
+REQUIRED_METADATA = {"hermes.tags"}
+
+OFFICIAL_ALLOWED_FIELDS = {"name", "description", "license", "allowed-tools", "metadata", "compatibility"}
 
 
 def validate_frontmatter(content: str, path: Path) -> Tuple[bool, List[str]]:
-    """Validate frontmatter structure and required fields."""
+    """Validate frontmatter structure and required fields (Hermes HARDLINE)."""
     errors = []
 
     # Must start with --- at byte 0
@@ -49,7 +54,7 @@ def validate_frontmatter(content: str, path: Path) -> Tuple[bool, List[str]]:
         errors.append("Frontmatter must be a YAML mapping")
         return False, errors
 
-    # Required fields
+    # Required fields (Hermes HARDLINE)
     for field in REQUIRED_FIELDS:
         if field not in fm:
             errors.append(f"Missing required frontmatter field: {field}")
@@ -64,7 +69,7 @@ def validate_frontmatter(content: str, path: Path) -> Tuple[bool, List[str]]:
         elif not re.match(r"^[a-z][a-z0-9-]*$", name):
             errors.append("name must be lowercase, hyphens only, start with letter")
 
-    # Description validation (HARDLINE)
+    # Description validation (HARDLINE: ≤60 chars)
     if "description" in fm:
         desc = fm["description"]
         if not isinstance(desc, str):
@@ -119,12 +124,54 @@ def validate_frontmatter(content: str, path: Path) -> Tuple[bool, List[str]]:
                 elif not isinstance(hermes["tags"], list):
                     errors.append("metadata.hermes.tags must be a list")
 
-                if "related_skills" not in hermes:
-                    errors.append("metadata.hermes.related_skills required")
-                elif not isinstance(hermes["related_skills"], list):
+                # related_skills is optional; if present, must be a list
+                if "related_skills" in hermes and not isinstance(hermes["related_skills"], list):
                     errors.append("metadata.hermes.related_skills must be a list")
 
     return len(errors) == 0, errors
+
+
+def validate_official_spec(skill_dir: Path) -> Tuple[bool, List[str]]:
+    """Validate using official Agent Skills spec validator (skills-ref)."""
+    errors = []
+
+    # Find skills-ref executable (prefer venv, then PATH)
+    skills_ref_cmd = None
+    for candidate in [
+        "/home/sjefsharp/Projects/hermes-skills/.venv/bin/skills-ref",
+        "skills-ref",
+    ]:
+        if Path(candidate).exists() or candidate == "skills-ref":
+            skills_ref_cmd = candidate
+            break
+
+    if not skills_ref_cmd:
+        errors.append("Official validator 'skills-ref' not found. Install with: pip install -e /path/to/skills-ref")
+        return False, errors
+
+    try:
+        result = subprocess.run(
+            [skills_ref_cmd, "validate", str(skill_dir)],
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+    except subprocess.TimeoutExpired:
+        errors.append("Official validator timed out")
+        return False, errors
+    except FileNotFoundError:
+        errors.append(f"Official validator not found at {skills_ref_cmd}")
+        return False, errors
+
+    if result.returncode != 0:
+        # Parse output for structured errors
+        output = result.stdout + result.stderr
+        for line in output.strip().split("\n"):
+            line = line.strip()
+            if line and not line.startswith("Validation failed"):
+                errors.append(f"Official spec: {line}")
+
+    return result.returncode == 0, errors
 
 
 def validate_body(content: str, path: Path) -> Tuple[bool, List[str]]:
@@ -202,27 +249,111 @@ def validate_related_skills(fm: dict, repo_root: Path) -> Tuple[bool, List[str]]
     return len(errors) == 0, errors
 
 
+def find_skill_dirs(repo_root: Path) -> List[Path]:
+    """Find all skill directories in the repository."""
+    skill_dirs = []
+    for base in ["skills", "optional-skills"]:
+        base_dir = repo_root / base
+        if base_dir.exists():
+            for cat_dir in base_dir.iterdir():
+                if cat_dir.is_dir():
+                    for skill_dir in cat_dir.iterdir():
+                        if skill_dir.is_dir() and (skill_dir / "SKILL.md").exists():
+                            skill_dirs.append(skill_dir)
+    return sorted(skill_dirs)
+
+
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: python3 scripts/validate-skills.py <path-to-SKILL.md>")
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Validate SKILL.md files")
+    parser.add_argument("path", nargs="?", help="Path to SKILL.md file or skill directory")
+    parser.add_argument("--all", action="store_true", help="Validate all skills in repository")
+    parser.add_argument("--official", action="store_true", help="Also run official Agent Skills spec validator (skills-ref)")
+    parser.add_argument("--changed", action="store_true", help="Validate only git-changed skills (not implemented)")
+    args = parser.parse_args()
+
+    repo_root = Path.cwd()
+
+    if args.all:
+        skill_dirs = find_skill_dirs(repo_root)
+        if not skill_dirs:
+            print("No skills found in repository")
+            sys.exit(0)
+
+        all_passed = True
+        for skill_dir in skill_dirs:
+            skill_md = skill_dir / "SKILL.md"
+            print(f"\n=== Validating {skill_dir.relative_to(repo_root)} ===")
+
+            # Hermes HARDLINE validation
+            content = skill_md.read_text(encoding="utf-8")
+            ok, errors = validate_frontmatter(content, skill_md)
+            if ok:
+                match = re.search(r"\n---\s*\n", content[3:])
+                if match:
+                    fm_text = content[3:match.start() + 3]
+                    fm = yaml.safe_load(fm_text)
+                    ok2, errors2 = validate_related_skills(fm, repo_root)
+                    errors.extend(errors2)
+
+            ok, errors = validate_body(content, skill_md)
+            ok2, errors2 = validate_content_size(content, skill_md)
+            errors.extend(errors2)
+
+            if errors:
+                all_passed = False
+                print(f"❌ Hermes HARDLINE FAILED for {skill_dir.relative_to(repo_root)}")
+                for err in errors:
+                    print(f"  - {err}")
+            else:
+                print(f"✅ Hermes HARDLINE PASSED for {skill_dir.relative_to(repo_root)}")
+
+            # Official spec validation
+            if args.official:
+                ok_official, errors_official = validate_official_spec(skill_dir)
+                if errors_official:
+                    all_passed = False
+                    print(f"❌ Official spec FAILED for {skill_dir.relative_to(repo_root)}")
+                    for err in errors_official:
+                        print(f"  - {err}")
+                else:
+                    print(f"✅ Official spec PASSED for {skill_dir.relative_to(repo_root)}")
+
+        if all_passed:
+            print("\n✅ All validations PASSED")
+            sys.exit(0)
+        else:
+            print("\n❌ Some validations FAILED")
+            sys.exit(1)
+
+    if not args.path:
+        print("Usage: python3 scripts/validate-skills.py <path-to-SKILL.md> [--all] [--official]")
         sys.exit(1)
 
-    path = Path(sys.argv[1])
+    path = Path(args.path)
     if not path.exists():
         print(f"Error: File not found: {path}")
         sys.exit(1)
+
+    # If path is a directory, look for SKILL.md inside
+    if path.is_dir():
+        skill_md = path / "SKILL.md"
+        if not skill_md.exists():
+            print(f"Error: SKILL.md not found in {path}")
+            sys.exit(1)
+        path = skill_md
 
     content = path.read_text(encoding="utf-8")
     repo_root = path.parent.parent.parent  # skills/<cat>/<skill>/SKILL.md -> repo_root
 
     all_errors = []
 
-    # Validate frontmatter
+    # Hermes HARDLINE validation
     ok, errors = validate_frontmatter(content, path)
     all_errors.extend(errors)
 
     if ok:
-        # Parse frontmatter for related_skills check
         match = re.search(r"\n---\s*\n", content[3:])
         if match:
             fm_text = content[3:match.start() + 3]
@@ -230,13 +361,18 @@ def main():
             ok2, errors2 = validate_related_skills(fm, repo_root)
             all_errors.extend(errors2)
 
-    # Validate body
     ok, errors = validate_body(content, path)
     all_errors.extend(errors)
 
-    # Validate content size
     ok, errors = validate_content_size(content, path)
     all_errors.extend(errors)
+
+    # Official spec validation
+    if args.official:
+        skill_dir = path.parent
+        ok_official, errors_official = validate_official_spec(skill_dir)
+        if errors_official:
+            all_errors.extend([f"Official spec: {e}" for e in errors_official])
 
     if all_errors:
         print(f"❌ Validation FAILED for {path}")
