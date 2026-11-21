@@ -1,4 +1,3 @@
----
 # Lefthook Configuration
 # https://lefthook.dev/configuration/
 
@@ -68,4 +67,3 @@ pre-push:
           exit 1
         fi
       stage_fixed: false
-...

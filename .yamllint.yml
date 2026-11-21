@@ -32,3 +32,4 @@ ignore:
   - pnpm-lock.yaml
   - .github/workflows/*.yml
   - .github/workflows/*.yaml
+  - .github/dependabot.yml
