@@ -28,3 +28,7 @@ rules:
   comments:
     level: warning
     require-starting-space: true
+ignore:
+  - pnpm-lock.yaml
+  - .github/workflows/*.yml
+  - .github/workflows/*.yaml
