@@ -1,20 +1,21 @@
-# hermes-skills — Repository Instructions for AI Agents
+# skills — Repository Instructions for AI Agents
 
 **Scope:** Entire repository. More specific `AGENTS.md` files in skill directories add rules for their subtrees.
 
 ## 1. Repository Identity
 
-- **Name:** hermes-skills
-- **Type:** Canonical source repository for Hermes Agent Skills (bundled + optional)
-- **Target Runtime:** Hermes Agent (CLI, TUI, Desktop, Web, ACP)
-- **Package Manager:** None required for skills (plain Markdown + optional scripts). If scripts are added, **pnpm only** — `npm`/`yarn` forbidden.
+- **Name:** skills
+- **Type:** Canonical source repository for portable Agent Skills (bundled + optional)
+- **Target Runtime:** Compatible agent runtimes (CLI, TUI, Desktop, Web, ACP)
+- **Package Manager:** None required for skills (plain Markdown + optional scripts).
+  If scripts are added, **pnpm only** — `npm`/`yarn` forbidden.
 - **Language:** Markdown (SKILL.md), optional Python/TypeScript/Shell scripts in `scripts/`
 - **License:** MIT (see `LICENSE`)
 
 ## 2. Architecture
 
 ```
-hermes-skills/
+skills/
 ├── skills/                    # Bundled skills (always available)
 │   └── <category>/<skill>/   # One skill per directory
 │       ├── SKILL.md          # Required: frontmatter + body
@@ -39,22 +40,22 @@ hermes-skills/
 
 ## 3. Skill Authoring Standards (HARDLINE)
 
-Source of truth: [Hermes Agent Skill Authoring Standards](https://hermes-agent.nousresearch.com/docs/skills/authoring). This file operationalizes those rules.
+Source of truth: [Skill Authoring Standards](https://github.com/sjefsharp/skills/blob/main/docs/authoring.md).
+This file operationalizes those rules.
 
 ### 3.1 Required Frontmatter (every SKILL.md)
 
 ```yaml
 ---
-name: my-skill-name              # lowercase, hyphens, ≤64 chars
+name: my-skill-name # lowercase, hyphens, ≤64 chars
 description: Concise capability statement, under sixty chars.
-version: 0.1.0                   # semver; new skills start at 0.1.0
-author: Real Name (github-handle), Hermes Agent
+version: 0.1.0 # semver; new skills start at 0.1.0
+author: Real Name (github-handle)
 license: MIT
-platforms: [linux, macos, windows]  # audit from actual prose/scripts
+platforms: [linux, macos, windows] # audit from actual prose/scripts
 metadata:
-  hermes:
-    tags: [Short, Descriptive, Tags]
-    related_skills: [other-in-repo-skill]
+  tags: [Short, Descriptive, Tags]
+  related_skills: [other-in-repo-skill]
 ---
 ```
 
@@ -67,8 +68,8 @@ metadata:
 
 ### 3.3 Author Rules
 
-- Credit **human first**, then "Hermes Agent": `Ben Barclay (benbarclay), Hermes Agent`
-- Never `author: Hermes Agent` alone for contributed skills
+- Credit **human first**: `Ben Barclay (benbarclay)`
+- Never `author: Agent` alone for contributed skills
 
 ### 3.4 Related Skills Rules
 
@@ -77,14 +78,15 @@ metadata:
 
 ### 3.5 Platform Gating: Audit, Don't Trust
 
-| Skill uses… | `platforms:` |
-|-------------|--------------|
-| Hermes tools + stdlib Python + cross-platform CLIs | `[linux, macos, windows]` |
-| bash pipelines, `grep`/`awk`/`sed`, heredocs | `[linux, macos]` |
-| `osascript`, `defaults`, `pmset` | `[macos]` |
-| `apt`/`systemctl`/`/proc` | `[linux]` |
+| Skill uses…                                  | `platforms:`              |
+| -------------------------------------------- | ------------------------- |
+| Stdlib Python + cross-platform CLIs          | `[linux, macos, windows]` |
+| bash pipelines, `grep`/`awk`/`sed`, heredocs | `[linux, macos]`          |
+| `osascript`, `defaults`, `pmset`             | `[macos]`                 |
+| `apt`/`systemctl`/`/proc`                    | `[linux]`                 |
 
-Default: fix cross-platform first (`tempfile.gettempdir()`, `pathlib.Path`, `psutil.pid_exists`); gate narrower only when genuinely platform-bound.
+Default: fix cross-platform first (`tempfile.gettempdir()`, `pathlib.Path`,
+`psutil.pid_exists`); gate narrower only when genuinely platform-bound.
 
 ### 3.6 Size Limits
 
@@ -99,7 +101,7 @@ Default: fix cross-platform first (`tempfile.gettempdir()`, `pathlib.Path`, `psu
 
 ## When to Use          — bulleted triggers + "Don't use for:" counter-triggers
 ## Prerequisites        — exact env vars, installs, API key sourcing
-## How to Run           — canonical invocation through Hermes tools
+## How to Run           — canonical invocation through agent tools
 ## Quick Reference      — flat command list, no narration
 ## Procedure            — numbered steps, each with checkable completion criterion
 ## Pitfalls             — known limits, things that look broken but aren't
@@ -108,9 +110,12 @@ Default: fix cross-platform first (`tempfile.gettempdir()`, `pathlib.Path`, `psu
 
 Minimum sections: When to Use + actionable body + Pitfalls + Verification.
 
-### 3.8 Reference Hermes Tools, Not Raw Shell
+### 3.8 Reference Agent Tools, Not Raw Shell
 
-Name proper Hermes tools in backticks: `terminal`, `read_file`, `write_file`, `patch`, `search_files`, `web_search`, `web_extract`, `browser_navigate`, `vision_analyze`, `delegate_task`, `cronjob`. Do NOT name shell utilities the agent already has wrapped.
+Name proper agent tools in backticks: `terminal`, `read_file`, `write_file`,
+`patch`, `search_files`, `web_search`, `web_extract`, `browser_navigate`,
+`vision_analyze`, `delegate_task`, `cronjob`. Do NOT name shell utilities the
+agent already has wrapped.
 
 ### 3.9 No Machine-Local Paths
 
@@ -118,10 +123,10 @@ Write repo-relative paths (`skills/...`, `scripts/...`). No `/home/<user>/...` p
 
 ## 4. Tier Decision: Bundled vs Optional
 
-| Tier | Criteria | Location |
-|------|----------|----------|
-| **Bundled** | Daily-driver, broadly useful, low footprint. "A user loads this in 5+ sessions/month." | `skills/<category>/<skill>/` |
-| **Optional** | Niche, vertical-specific, heavy, or recurring-job skills | `optional-skills/<category>/<skill>/` |
+| Tier         | Criteria                                                                               | Location                              |
+| ------------ | -------------------------------------------------------------------------------------- | ------------------------------------- |
+| **Bundled**  | Daily-driver, broadly useful, low footprint. "A user loads this in 5+ sessions/month." | `skills/<category>/<skill>/`          |
+| **Optional** | Niche, vertical-specific, heavy, or recurring-job skills                               | `optional-skills/<category>/<skill>/` |
 
 **When in doubt: optional.** Promoting later is easy; demoting is churn.
 
@@ -144,7 +149,9 @@ Write repo-relative paths (`skills/...`, `scripts/...`). No `/home/<user>/...` p
 python3 scripts/validate-skills.py skills/<category>/<name>/SKILL.md
 ```
 
-Checks: frontmatter at byte 0, name/description present, description ≤60 chars + period, platforms present, related_skills resolve in-repo, content ≤100k chars.
+Checks: frontmatter at byte 0, name/description present, description ≤60
+chars + period, platforms present, related_skills resolve in-repo,
+content ≤100k chars.
 
 ### 5.3 Editing Existing Skills
 
@@ -229,13 +236,13 @@ Preserves review diffs and inline comments. Rebase/amend only when explicitly re
 
 ## 8. Trigger → Action → Proof Rules
 
-| Trigger | Action | Required Proof |
-|---------|--------|----------------|
+| Trigger           | Action                                                  | Required Proof                                                                            |
+| ----------------- | ------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
 | New skill created | Validate frontmatter + structure; add tests; regen docs | `python scripts/validate-skills.py <path>` ✓; tests pass; docs diff shows only your skill |
-| Skill edited | Re-validate; update tests if behavior changed | Same as above |
-| PR opened | CI runs validation + tests + docs scope check | All green; sidebar has exactly one entry for slug |
-| Commit pushed | Pre-commit hooks run (if configured) | Hook output shows success |
-| Validation fails | Investigate cause; retain logs/exit status | **STOP** — never bypass with `--no-verify`, `SKIP`, fabricated green |
+| Skill edited      | Re-validate; update tests if behavior changed           | Same as above                                                                             |
+| PR opened         | CI runs validation + tests + docs scope check           | All green; sidebar has exactly one entry for slug                                         |
+| Commit pushed     | Pre-commit hooks run (if configured)                    | Hook output shows success                                                                 |
+| Validation fails  | Investigate cause; retain logs/exit status              | **STOP** — never bypass with `--no-verify`, `SKIP`, fabricated green                      |
 
 ## 9. Validation Gates (Must Pass Before Merge)
 
@@ -250,6 +257,7 @@ Preserves review diffs and inline comments. Rebase/amend only when explicitly re
 ## 10. Finish a Task
 
 Report:
+
 - Changed paths (skills modified, governance files touched)
 - Baseline SHA (`git rev-parse HEAD~1`)
 - Commands actually run (validation, tests, docs gen) with exit codes
@@ -263,9 +271,9 @@ Report:
 
 ## 11. Change Log
 
-| Date | Change | Author |
-|------|--------|--------|
-| 2026-11-21 | Initial AGENTS.md for hermes-skills repository | Agent |
+| Date       | Change                                  | Author |
+| ---------- | --------------------------------------- | ------ |
+| 2026-11-21 | Initial AGENTS.md for skills repository | Agent  |
 
 ---
 
