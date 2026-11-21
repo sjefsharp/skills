@@ -1,0 +1,70 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+*.log
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+venv/
+.env
+.env.local
+.env.*.local
+
+# Node / pnpm
+node_modules/
+.pnpm-store/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+.eslintcache
+.prettierrc
+
+# Build outputs
+dist/
+build/
+*.egg-info/
+.parcel-cache/
+.turbo/
+
+# IDE / tooling
+*.sublime-project
+*.sublime-workspace
+.project
+.classpath
+.settings/
+
+# Secrets (never commit)
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+secrets/
+*.env.secret
+
+# Test artifacts
+coverage/
+.nyc_output/
+playwright-report/
+test-results/
+
+# Temporary
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Skill-specific
+*.bundle
+*.pack

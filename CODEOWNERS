@@ -1,0 +1,38 @@
+# CODEOWNERS — hermes-skills
+# Pattern: path  @owner1 @owner2
+# Order matters: last match wins. Use specific paths before wildcards.
+
+# Repository governance
+/                       @sjefsharp
+/AGENTS.md              @sjefsharp
+/CONTRIBUTING.md        @sjefsharp
+/SECURITY.md            @sjefsharp
+/LICENSE                @sjefsharp
+/CODEOWNERS             @sjefsharp
+/.github/               @sjefsharp
+/scripts/               @sjefsharp
+/references/            @sjefsharp
+/assets/                @sjefsharp
+
+# Bundled skills — category owners (extend as needed)
+/skills/software-development/   @sjefsharp
+/skills/autonomous-ai-agents/   @sjefsharp
+/skills/creative/               @sjefsharp
+/skills/productivity/           @sjefsharp
+/skills/research/               @sjefsharp
+/skills/web/                    @sjefsharp
+/skills/frontend/               @sjefsharp
+/skills/media/                  @sjefsharp
+/skills/email/                  @sjefsharp
+/skills/note-taking/            @sjefsharp
+/skills/devops/                 @sjefsharp
+
+# Optional skills — same owners
+/optional-skills/               @sjefsharp
+
+# Tests
+/tests/                         @sjefsharp
+
+# Documentation (if generator added)
+/website/                       @sjefsharp
+/docs/                          @sjefsharp
