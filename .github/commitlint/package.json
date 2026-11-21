@@ -1,0 +1,16 @@
+{
+  "name": "hermes-skills-commitlint",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Commitlint configuration for hermes-skills",
+  "scripts": {
+    "lint": "commitlint --edit"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "19.5.0",
+    "@commitlint/config-conventional": "19.5.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

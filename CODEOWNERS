@@ -2,6 +2,9 @@
 # Pattern: path  @owner1 @owner2
 # Order matters: last match wins. Use specific paths before wildcards.
 
+# Global ownership
+*                       @sjefsharp
+
 # Repository governance
 /                       @sjefsharp
 /AGENTS.md              @sjefsharp
@@ -9,12 +12,26 @@
 /SECURITY.md            @sjefsharp
 /LICENSE                @sjefsharp
 /CODEOWNERS             @sjefsharp
+/README.md              @sjefsharp
+/.gitignore             @sjefsharp
+/.markdownlint.json     @sjefsharp
+/.yamllint.yml          @sjefsharp
+
+# GitHub configuration
 /.github/               @sjefsharp
+/.github/workflows/     @sjefsharp
+/.github/pull_request_template.md  @sjefsharp
+/.github/commitlint/    @sjefsharp
+/.github/dependabot.yml @sjefsharp
+
+# Repository tooling
 /scripts/               @sjefsharp
+/tests/                 @sjefsharp
 /references/            @sjefsharp
 /assets/                @sjefsharp
 
-# Bundled skills — category owners (extend as needed)
+# Bundled skills (all owned by @sjefsharp)
+/skills/                @sjefsharp
 /skills/software-development/   @sjefsharp
 /skills/autonomous-ai-agents/   @sjefsharp
 /skills/creative/               @sjefsharp
@@ -27,12 +44,5 @@
 /skills/note-taking/            @sjefsharp
 /skills/devops/                 @sjefsharp
 
-# Optional skills — same owners
-/optional-skills/               @sjefsharp
-
-# Tests
-/tests/                         @sjefsharp
-
-# Documentation (if generator added)
-/website/                       @sjefsharp
-/docs/                          @sjefsharp
+# Optional skills
+/optional-skills/       @sjefsharp
