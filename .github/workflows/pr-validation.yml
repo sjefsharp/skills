@@ -223,16 +223,38 @@ jobs:
     steps:
       - name: Check all jobs passed
         run: |
-          # Skip jobs that were skipped (e.g., branch-name on push events)
-          for job in validate-skills test commitlint branch-name security markdown-lint yaml-lint validate-workflow; do
-            result="${{ needs.$job.result }}"
-            if [[ "$result" == "skipped" ]]; then
-              echo "Job $job was skipped, ignoring"
-              continue
-            fi
-            if [[ "$result" != "success" ]]; then
-              echo "Job $job failed with result: $result"
-              exit 1
-            fi
-          done
+          # Check each required job, skipping branch-name on push events
+          if [[ "${{ needs.validate-skills.result }}" != "success" ]]; then
+            echo "validate-skills failed"
+            exit 1
+          fi
+          if [[ "${{ needs.test.result }}" != "success" ]]; then
+            echo "test failed"
+            exit 1
+          fi
+          if [[ "${{ needs.commitlint.result }}" != "success" ]]; then
+            echo "commitlint failed"
+            exit 1
+          fi
+          # branch-name only runs on pull_request, so it may be skipped on push
+          if [[ "${{ needs.branch-name.result }}" != "success" && "${{ needs.branch-name.result }}" != "skipped" ]]; then
+            echo "branch-name failed"
+            exit 1
+          fi
+          if [[ "${{ needs.security.result }}" != "success" ]]; then
+            echo "security failed"
+            exit 1
+          fi
+          if [[ "${{ needs.markdown-lint.result }}" != "success" ]]; then
+            echo "markdown-lint failed"
+            exit 1
+          fi
+          if [[ "${{ needs.yaml-lint.result }}" != "success" ]]; then
+            echo "yaml-lint failed"
+            exit 1
+          fi
+          if [[ "${{ needs.validate-workflow.result }}" != "success" ]]; then
+            echo "validate-workflow failed"
+            exit 1
+          fi
           echo "All checks passed"
