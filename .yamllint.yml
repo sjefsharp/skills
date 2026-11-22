@@ -33,3 +33,5 @@ ignore:
   - .github/workflows/*.yml
   - .github/workflows/*.yaml
   - .github/dependabot.yml
+  - node_modules/
+  - .venv/

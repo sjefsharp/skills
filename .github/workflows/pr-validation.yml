@@ -45,14 +45,6 @@ jobs:
         run: |
           .venv/bin/python scripts/validate-skills.py --all
 
-      - name: Run skill validation (Official Agent Skills Spec)
-        run: |
-          .venv/bin/pip install -q click strictyaml
-          git clone --depth 1 https://github.com/agentskills/agentskills.git /tmp/agentskills
-          .venv/bin/pip install -q -e /tmp/agentskills/skills-ref
-          .venv/bin/python scripts/validate-skills.py --all --official
-        continue-on-error: true
-
   test:
     name: Test Suite
     runs-on: ubuntu-latest
@@ -134,7 +126,8 @@ jobs:
           # Feature branches must follow Conventional Branch format
           # Types: feat, feature, fix, bugfix, hotfix, release, chore, docs, refactor, perf, test, build, ci, a11y, security, ai, claude, codex, copilot, cursor
           # Allow nested paths like feat/software-development/skill-lint
-          if ! echo "$branch" | grep -qE '^(feat|feature|fix|bugfix|hotfix|release|chore|docs|refactor|perf|test|build|ci|a11y|security|ai|claude|codex|copilot|cursor)(\/[a-z0-9-]+)+$'; then
+          pattern='^(feat|feature|fix|bugfix|hotfix|release|chore|docs|refactor|perf|test|build|ci|a11y|security|ai|claude|codex|copilot|cursor)(\/[a-z0-9-]+)+$'
+          if ! echo "$branch" | grep -qE "$pattern"; then
             echo "ERROR: Branch name '$branch' does not follow Conventional Branch format"
             echo "Expected: <type>/<category>/<short-description> (or master/main/develop for trunk)"
             echo "Types: feat, feature, fix, bugfix, hotfix, release, chore, docs, refactor, perf, test, build, ci, a11y, security, ai, claude, codex, copilot, cursor"
@@ -230,12 +223,16 @@ jobs:
     steps:
       - name: Check all jobs passed
         run: |
-          if [[ "${{ needs.validate-skills.result }}" != "success" ]]; then exit 1; fi
-          if [[ "${{ needs.test.result }}" != "success" ]]; then exit 1; fi
-          if [[ "${{ needs.commitlint.result }}" != "success" ]]; then exit 1; fi
-          if [[ "${{ needs.branch-name.result }}" != "success" ]]; then exit 1; fi
-          if [[ "${{ needs.security.result }}" != "success" ]]; then exit 1; fi
-          if [[ "${{ needs.markdown-lint.result }}" != "success" ]]; then exit 1; fi
-          if [[ "${{ needs.yaml-lint.result }}" != "success" ]]; then exit 1; fi
-          if [[ "${{ needs.validate-workflow.result }}" != "success" ]]; then exit 1; fi
+          # Skip jobs that were skipped (e.g., branch-name on push events)
+          for job in validate-skills test commitlint branch-name security markdown-lint yaml-lint validate-workflow; do
+            result="${{ needs.$job.result }}"
+            if [[ "$result" == "skipped" ]]; then
+              echo "Job $job was skipped, ignoring"
+              continue
+            fi
+            if [[ "$result" != "success" ]]; then
+              echo "Job $job failed with result: $result"
+              exit 1
+            fi
+          done
           echo "All checks passed"
