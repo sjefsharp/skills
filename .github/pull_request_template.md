@@ -1,9 +1,9 @@
 ---
 name: Skill PR
 about: Add, update, or remove a Hermes Agent Skill
-title: "<type>(<category>/<skill>): <description>"
-labels: ["skill"]
-assignees: ""
+title: '<type>(<category>/<skill>): <description>'
+labels: ['skill']
+assignees: ''
 ---
 
 ## Type
@@ -17,7 +17,9 @@ assignees: ""
 
 ## Skill Identity
 
-- **Category:** `software-development` / `autonomous-ai-agents` / `creative` / `productivity` / `research` / `web` / `frontend` / `media` / `email` / `note-taking` / `devops`
+- **Category:** `software-development` / `autonomous-ai-agents` / `creative` /
+  `productivity` / `research` / `web` / `frontend` / `media` / `email` /
+  `note-taking` / `devops`
 - **Skill name:** `<skill-name>` (lowercase, hyphens)
 - **Tier:** `bundled` (skills/) or `optional` (optional-skills/)
 - **Path:** `skills/<category>/<skill-name>/` or `optional-skills/<category>/<skill-name>/`
@@ -60,16 +62,18 @@ gitleaks detect --source .
 - [ ] `platforms:` audited against actual prose/scripts
 - [ ] All `related_skills` resolve in-repo
 - [ ] No machine-local paths (`/home/...`, `/Users/...`, etc.)
-- [ ] Commands use Hermes tools (`terminal`, `read_file`, `write_file`, `patch`, `search_files`, `web_search`, `web_extract`, `browser_navigate`, `vision_analyze`, `delegate_task`, `cronjob`)
+- [ ] Commands use Hermes tools (`terminal`, `read_file`, `write_file`,
+      `patch`, `search_files`, `web_search`, `web_extract`, `browser_navigate`,
+      `vision_analyze`, `delegate_task`, `cronjob`)
 - [ ] Each procedure step has checkable completion criterion
 
 ## Testing
 
-| Test | Command | Exit Code |
-|------|---------|-----------|
-| Frontmatter validation | `python3 scripts/validate-skills.py ...` | 0 |
-| Skill tests | `pytest tests/skills/test_<skill-name>_skill.py -q` | 0 |
-| Secret scan | `gitleaks detect --source .` | 0 |
+| Test                   | Command                                             | Exit Code |
+| ---------------------- | --------------------------------------------------- | --------- |
+| Frontmatter validation | `python3 scripts/validate-skills.py ...`            | 0         |
+| Skill tests            | `pytest tests/skills/test_<skill-name>_skill.py -q` | 0         |
+| Secret scan            | `gitleaks detect --source .`                        | 0         |
 
 ## Documentation (If Generator Exists)
 
@@ -110,6 +114,7 @@ If the skill produces visible output (diagrams, reports, etc.), attach a screens
 ---
 
 **By submitting this PR, I confirm:**
+
 - I have read [CONTRIBUTING.md](CONTRIBUTING.md) and [AGENTS.md](AGENTS.md)
 - This skill follows the [Hermes Agent Skill Authoring Standards](https://hermes-agent.nousresearch.com/docs/skills/authoring)
 - No secrets, tokens, or private credentials are included

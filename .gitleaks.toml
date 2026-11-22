@@ -6,7 +6,7 @@
 useDefault = true
 
 [allowlist]
-description = "Allowlisted patterns for this repository"
+description = 'Allowlisted patterns for this repository'
 paths = [
   "(?i)^.*\\.md$",
   "(?i)^.*\\.json$",
@@ -19,10 +19,10 @@ paths = [
   "(?i)^.*\\.gitattributes$",
   "(?i)^.*\\.editorconfig$",
   "(?i)^CHANGELOG\\.md$",
-  "(?i)^LICENSE$",
+  '(?i)^LICENSE$',
   "(?i)^README\\.md$",
   "(?i)^TODO\\.md$",
-  "(?i)^VERSION$",
+  '(?i)^VERSION$',
   "(?i)^release-please-config\\.json$",
   "(?i)^\\.release-please-manifest\\.json$",
   "(?i)^\\.markdownlint\\.json$",
@@ -35,12 +35,12 @@ paths = [
   "(?i)^package\\.json$",
   "(?i)^pnpm-lock\\.yaml$",
   "(?i)^\\.github/.*",
-  "(?i)^scripts/.*",
-  "(?i)^tests/.*",
-  "(?i)^references/.*",
-  "(?i)^skills/.*",
-  "(?i)^optional-skills/.*",
-  "(?i)^assets/.*",
+  '(?i)^scripts/.*',
+  '(?i)^tests/.*',
+  '(?i)^references/.*',
+  '(?i)^skills/.*',
+  '(?i)^optional-skills/.*',
+  '(?i)^assets/.*',
 ]
 
 # Allow specific keys in config files

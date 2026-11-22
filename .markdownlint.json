@@ -11,5 +11,6 @@
   "MD041": false,
   "MD046": { "style": "fenced" },
   "MD049": { "style": "fenced" },
-  "MD050": { "style": "consistent" }
+  "MD050": { "style": "consistent" },
+  "ignore": ["node_modules/**", ".venv/**"]
 }

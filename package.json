@@ -7,7 +7,7 @@
   },
   "scripts": {
     "prepare": "lefthook install",
-    "lint": "prettier --check . && markdownlint . && yamllint .",
+    "lint": "prettier --check . && markdownlint \"**/*.md\" --ignore \"node_modules/**\" --ignore \".venv/**\" --config .markdownlint.json && yamllint .",
     "format": "prettier --write .",
     "validate:skills": "python skills/software-development/skill-lint/scripts/validate-skills.py --all",
     "test": "python -m pytest skills/software-development/skill-lint/evals/ -q"
@@ -18,11 +18,16 @@
     "@gitmoji/commit-types": "^1.1.5",
     "@gitmoji/parser-opts": "^1.4.0",
     "commitlint-plugin-gitmoji": "^2.2.6",
-    "jsonlint": "^1.6.3",
     "lefthook": "^2.2.2",
-    "markdownlint-cli": "^0.50.0",
+    "markdownlint-cli": "^0.50.1",
     "prettier": "^3.10.1",
-    "prettier-plugin-toml": "^2.0.0",
+    "prettier-plugin-toml": "^4.1.0",
     "yaml": "^2.9.1"
+  },
+  "pnpm": {
+    "overrides": {
+      "katex": "^0.18.2",
+      "minimatch": "^11.0.9"
+    }
   }
 }

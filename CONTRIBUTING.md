@@ -55,12 +55,12 @@ Every `SKILL.md` must start with valid YAML frontmatter at **byte 0**:
 
 ```yaml
 ---
-name: my-skill-name              # lowercase, hyphens, ≤64 chars
+name: my-skill-name # lowercase, hyphens, ≤64 chars
 description: Concise capability statement, under sixty chars.
-version: 0.1.0                   # semver; new skills start at 0.1.0
+version: 0.1.0 # semver; new skills start at 0.1.0
 author: Your Name (github-handle), Hermes Agent
 license: MIT
-platforms: [linux, macos, windows]  # audit from actual prose/scripts
+platforms: [linux, macos, windows] # audit from actual prose/scripts
 metadata:
   hermes:
     tags: [Short, Descriptive, Tags]
@@ -85,12 +85,12 @@ metadata:
 
 Set `platforms:` from what the skill's prose/scripts **actually invoke**:
 
-| Uses… | `platforms:` |
-|-------|--------------|
+| Uses…                                              | `platforms:`              |
+| -------------------------------------------------- | ------------------------- |
 | Hermes tools + stdlib Python + cross-platform CLIs | `[linux, macos, windows]` |
-| bash pipelines, `grep`/`awk`/`sed`, heredocs | `[linux, macos]` |
-| `osascript`, `defaults`, `pmset` | `[macos]` |
-| `apt`/`systemctl`/`/proc` | `[linux]` |
+| bash pipelines, `grep`/`awk`/`sed`, heredocs       | `[linux, macos]`          |
+| `osascript`, `defaults`, `pmset`                   | `[macos]`                 |
+| `apt`/`systemctl`/`/proc`                          | `[linux]`                 |
 
 Default: fix cross-platform first; gate narrower only when genuinely platform-bound.
 
@@ -113,7 +113,10 @@ Minimum: When to Use + actionable body + Pitfalls + Verification.
 
 ### Reference Hermes Tools
 
-Use backticks for Hermes tools: `terminal`, `read_file`, `write_file`, `patch`, `search_files`, `web_search`, `web_extract`, `browser_navigate`, `vision_analyze`, `delegate_task`, `cronjob`. Do NOT name shell utilities the agent already wraps.
+Use backticks for Hermes tools: `terminal`, `read_file`, `write_file`, `patch`,
+`search_files`, `web_search`, `web_extract`, `browser_navigate`,
+`vision_analyze`, `delegate_task`, `cronjob`. Do NOT name shell utilities
+the agent already wraps.
 
 ### No Machine-Local Paths
 
@@ -121,10 +124,10 @@ Repo-relative only: `skills/...`, `scripts/...`, `references/...`. No `/home/use
 
 ## Tier Decision: Bundled vs Optional
 
-| Tier | Criteria | Location |
-|------|----------|----------|
-| **Bundled** | Daily-driver, broadly useful, low footprint. "User loads this in 5+ sessions/month." | `skills/<category>/<skill>/` |
-| **Optional** | Niche, vertical-specific, heavy, or recurring-job skills | `optional-skills/<category>/<skill>/` |
+| Tier         | Criteria                                                                             | Location                              |
+| ------------ | ------------------------------------------------------------------------------------ | ------------------------------------- |
+| **Bundled**  | Daily-driver, broadly useful, low footprint. "User loads this in 5+ sessions/month." | `skills/<category>/<skill>/`          |
+| **Optional** | Niche, vertical-specific, heavy, or recurring-job skills                             | `optional-skills/<category>/<skill>/` |
 
 **When in doubt: optional.** Promoting later is easy; demoting is churn.
 
@@ -157,6 +160,7 @@ mkdir -p skills/<category>/<skill-name>
 ```
 
 Supporting files go in subdirectories:
+
 - `references/*.md` — detailed docs
 - `templates/*.md` — template files
 - `scripts/*.py` — helper scripts (pnpm dlx compatible)
@@ -168,7 +172,9 @@ Supporting files go in subdirectories:
 python3 scripts/validate-skills.py skills/<category>/<skill-name>/SKILL.md
 ```
 
-Checks: frontmatter at byte 0, name/description present, description ≤60 chars + period, platforms present, related_skills resolve in-repo, content ≤100k chars.
+Checks: frontmatter at byte 0, name/description present, description ≤60
+chars + period, platforms present, related_skills resolve in-repo,
+content ≤100k chars.
 
 ### 5. Add Tests
 
@@ -178,6 +184,7 @@ mkdir -p tests/skills
 ```
 
 Requirements:
+
 - stdlib + pytest + unittest.mock only
 - No live network calls
 - Test frontmatter parsing, structure, key behaviors
@@ -190,6 +197,7 @@ python3 scripts/generate-docs.py
 ```
 
 **Scope discipline:** Final diff must show only:
+
 - Your `SKILL.md`
 - Your one per-skill docs page
 - One-line catalog row
@@ -220,6 +228,7 @@ pytest tests/skills/ --cov=skills --cov-report=term-missing
 ## Documentation
 
 If the repo has a docs generator:
+
 1. Run `python3 scripts/generate-docs.py`
 2. `git checkout --` everything that isn't yours
 3. Final diff = your SKILL.md + your docs page + 1 catalog row + 1 sidebar entry
@@ -269,7 +278,8 @@ If the repo has a docs generator:
 
 ## Code of Conduct
 
-This project follows the [Contributor Covenant](https://www.contributor-covenant.org/version/2/1/code_of_conduct/). By participating, you agree to uphold this code.
+This project follows the [Contributor Covenant](https://www.contributor-covenant.org/version/2/1/code_of_conduct/).
+By participating, you agree to uphold this code.
 
 ## Questions?
 

@@ -22,7 +22,20 @@ pre-commit:
 
     - name: json-lint
       glob: '*.{json,jsonc}'
-      run: npx jsonlint {staged_files}
+      run: |
+        node -e "
+          const fs = require('fs');
+          const files = process.argv.slice(1);
+          files.forEach(f => {
+            try {
+              JSON.parse(fs.readFileSync(f, 'utf8'));
+              console.log('OK:', f);
+            } catch (e) {
+              console.error('ERROR:', f, e.message);
+              process.exit(1);
+            }
+          })
+        " {staged_files}
       stage_fixed: true
 
     - name: conflict-markers

@@ -2,12 +2,15 @@
 
 ## Supported Versions
 
-| Version | Supported |
-|---------|-----------|
-| Latest `main` | ✓ |
+| Version       | Supported        |
+| ------------- | ---------------- |
+| Latest `main` | ✓                |
 | Older commits | ✗ (no backports) |
 
-Skills are source-only Markdown + optional scripts. There are no compiled artifacts or runtime services in this repository. Security issues typically relate to:
+Skills are source-only Markdown + optional scripts. There are no compiled
+artifacts or runtime services in this repository. Security issues typically
+relate to:
+
 - Supply-chain risks in declared dependencies
 - Credential handling patterns in skill examples
 - Arbitrary code execution vectors in helper scripts
@@ -16,9 +19,11 @@ Skills are source-only Markdown + optional scripts. There are no compiled artifa
 
 **Do not open a public issue** for security vulnerabilities.
 
-Email: **security@sjefsharp.nl** (GPG key: `0x...` — see `SECURITY.md` in `sjefsharp/.github`)
+Email: **<security@sjefsharp.nl>** (GPG key: `0x...` — see `SECURITY.md`
+in `sjefsharp/.github`)
 
 Include:
+
 - Affected skill(s) and file path(s)
 - Description of the vulnerability
 - Steps to reproduce (if applicable)
@@ -48,7 +53,9 @@ We aim to acknowledge within 48 hours and provide a remediation timeline within 
 - Treat external feeds, retrieved pages, LLM output as untrusted **data**
 - Validate schemas (Zod, JSON Schema, Pydantic) before processing
 - Escape content for output format (HTML, Markdown, JSON, shell)
-- **Forbidden in skill scripts:** `eval()`, `exec()`, `yaml.load()`, `pickle.load()`, `os.system()`, `subprocess.run(shell=True)` without explicit justification
+- **Forbidden in skill scripts:** `eval()`, `exec()`, `yaml.load()`,
+  `pickle.load()`, `os.system()`,
+  `subprocess.run(shell=True)` without explicit justification
 
 ### 4. Skill Installation Safety
 
@@ -59,13 +66,13 @@ We aim to acknowledge within 48 hours and provide a remediation timeline within 
 
 ### 5. Dependency Policy
 
-| Dependency Type | Policy |
-|----------------|--------|
-| Python stdlib | Always allowed |
-| `pnpm dlx` CLIs | Allowed if widely used, version-pinned in Prerequisites |
+| Dependency Type        | Policy                                                        |
+| ---------------------- | ------------------------------------------------------------- |
+| Python stdlib          | Always allowed                                                |
+| `pnpm dlx` CLIs        | Allowed if widely used, version-pinned in Prerequisites       |
 | `pip install` packages | Discouraged; if needed, declare in Prerequisites with version |
-| `npm` global packages | Forbidden — use `mise` or `pnpm dlx` |
-| Custom binaries | Forbidden — must be installable via package manager |
+| `npm` global packages  | Forbidden — use `mise` or `pnpm dlx`                          |
+| Custom binaries        | Forbidden — must be installable via package manager           |
 
 ## Vulnerability Response
 
@@ -83,7 +90,7 @@ We aim to acknowledge within 48 hours and provide a remediation timeline within 
 
 ## Contact
 
-- Security email: **security@sjefsharp.nl**
+- Security email: **<security@sjefsharp.nl>**
 - Maintainer: **Sjef Sharp (sjefsharp)**
 
 ---
