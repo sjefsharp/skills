@@ -1,5 +1,5 @@
 {
-  "name": "hermes-skills",
+  "name": "skills",
   "version": "0.0.1",
   "packageManager": "pnpm@9.15.0",
   "engines": {
@@ -9,8 +9,8 @@
     "prepare": "lefthook install",
     "lint": "prettier --check . && markdownlint . && yamllint .",
     "format": "prettier --write .",
-    "validate:skills": "python scripts/validate-skills.py --all",
-    "test": "python -m pytest tests/ -q"
+    "validate:skills": "python skills/software-development/skill-lint/scripts/validate-skills.py --all",
+    "test": "python -m pytest skills/software-development/skill-lint/evals/ -q"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.2.4",
