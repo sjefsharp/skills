@@ -68,3 +68,4 @@ temp/
 # Skill-specific
 *.bundle
 *.pack
+.worktrees/
