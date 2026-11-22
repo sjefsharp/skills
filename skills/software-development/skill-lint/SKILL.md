@@ -2,25 +2,27 @@
 name: skill-lint
 description: Lint SKILL.md frontmatter and structure per authoring rules.
 version: 0.1.0
-author: Sjef Sharp (sjefsharp), Hermes Agent
+author: Sjef Sharp (sjefsharp)
 license: MIT
 platforms:
   - linux
   - macos
   - windows
 metadata:
-  hermes:
-    tags:
-      - skills
-      - validation
-      - linting
-      - authoring
-      - ci
+  tags:
+    - skills
+    - validation
+    - linting
+    - authoring
+    - ci
+  related_skills: []
 ---
 
 # Skill Lint Skill
 
-Validate `SKILL.md` files against the Hermes Agent Skill Authoring Standards — frontmatter, structure, description rules, platform gating, and cross-references. Designed for CI gates and pre-commit hooks.
+Validate `SKILL.md` files against the Skill Authoring Standards —
+frontmatter, structure, description rules, platform gating, and cross-references.
+Designed for CI gates and pre-commit hooks.
 
 ## When to Use
 
@@ -30,9 +32,10 @@ Validate `SKILL.md` files against the Hermes Agent Skill Authoring Standards —
 - Check a single skill during authoring
 
 **Don't use for:**
-- Runtime validation inside a Hermes session (skills are static source)
-- Validating non-Hermes markdown files
-- Replacing the full `hermes skills check` / `hermes skills audit` commands
+
+- Runtime validation inside an agent session (skills are static source)
+- Validating non-standard markdown files
+- Replacing the full `skills check` / `skills audit` commands
 
 ## Prerequisites
 
@@ -44,13 +47,13 @@ Validate `SKILL.md` files against the Hermes Agent Skill Authoring Standards —
 ### Single Skill
 
 ```bash
-python3 scripts/validate-skills.py skills/software-development/github/SKILL.md
+python3 skills/software-development/skill-lint/scripts/validate-skills.py skills/software-development/github/SKILL.md
 ```
 
 ### All Skills (Bundled + Optional)
 
 ```bash
-python3 scripts/validate-skills.py --all
+python3 skills/software-development/skill-lint/scripts/validate-skills.py --all
 ```
 
 ### As Pre-commit Hook
@@ -62,7 +65,7 @@ Add to `.pre-commit-config.yaml`:
   hooks:
     - id: skill-lint
       name: Validate SKILL.md files
-      entry: python3 scripts/validate-skills.py
+      entry: python3 skills/software-development/skill-lint/scripts/validate-skills.py
       language: system
       types: [file]
       files: 'skills/.*/SKILL\.md$|optional-skills/.*/SKILL\.md$'
@@ -71,16 +74,16 @@ Add to `.pre-commit-config.yaml`:
 
 ## Quick Reference
 
-| Command | Purpose |
-|---------|---------|
-| `python3 scripts/validate-skills.py <skill-path>` | Validate one skill (Hermes HARDLINE) |
-| `python3 scripts/validate-skills.py --all` | Validate all skills in repo (Hermes HARDLINE) |
-| `python3 scripts/validate-skills.py --all --official` | Also run official Agent Skills spec validator |
-| `skills-ref validate <skill-path>` | Official Agent Skills spec validator only |
+| Command                                                                                      | Purpose                                       |
+| -------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| `python3 skills/software-development/skill-lint/scripts/validate-skills.py <skill-path>`     | Validate one skill (HARDLINE)                 |
+| `python3 skills/software-development/skill-lint/scripts/validate-skills.py --all`            | Validate all skills in repo (HARDLINE)        |
+| `python3 skills/software-development/skill-lint/scripts/validate-skills.py --all --official` | Also run official Agent Skills spec validator |
+| `skills-ref validate <skill-path>`                                                           | Official Agent Skills spec validator only     |
 
 ## Procedure
 
-### 1. Validate a Single Skill (Hermes HARDLINE)
+### 1. Validate a Single Skill (HARDLINE)
 
 1. Run validator on the skill path
 2. Exit code 0 = pass, 1 = fail
@@ -96,7 +99,9 @@ Add to `.pre-commit-config.yaml`:
 
 1. Run with `--all --official` or use `skills-ref validate <skill-path>` directly
 2. Checks official spec compliance: allowed fields, name format, description length (≤1024), strictyaml parsing
-3. **Note:** Hermes skills use extended format (version, author, platforms at top-level) — official validator will flag these as unexpected fields. This is expected for Hermes skills.
+3. **Note:** This repo's skills use extended format (version, author,
+   platforms at top-level) — official validator will flag these as
+   unexpected fields. This is expected for this repo's skills.
 
 ### 4. Integrate in CI
 
@@ -107,27 +112,30 @@ Add to `.pre-commit-config.yaml`:
 ## Pitfalls
 
 - **Frontmatter at byte 0** — any leading whitespace/BOM fails validation
-- **Description ≤ 60 chars** — HARDLINE rule (Hermes); official spec allows ≤1024
-- **Platforms audited** — copied `platforms: [linux, macos, windows]` from a sibling without checking actual script dependencies will be caught
+- **Description ≤ 60 chars** — HARDLINE rule (this repo); official spec allows ≤1024
+- **Platforms audited** — copied `platforms: [linux, macos, windows]`
+  from a sibling without checking actual script dependencies will be caught
 - **Related skills must resolve** — referencing a skill that exists only in user profile or a sibling PR fails
 - **No machine-local paths** — absolute paths in body fails; use repo-relative paths
-- **Hermes tools not shell** — raw shell utilities (g-r-e-p, c-a-t, s-e-d, a-w-k, f-i-n-d, l-s) in body text flagged; use `search_files`, `read_file`, `patch`, etc.
+- **Agent tools not shell** — raw shell utilities (g-r-e-p, c-a-t, s-e-d,
+  a-w-k, f-i-n-d, l-s) in body text flagged; use `search_files`,
+  `read_file`, `patch`, etc.
 - **YAML flow-style** — `[a, b]` fails official spec (strictyaml); use block-style (`- a\n- b`)
 
 ## Verification
 
-### Validator Self-Test (Hermes HARDLINE)
+### Validator Self-Test (HARDLINE)
 
 ```bash
 # Should pass (this skill's own SKILL.md)
-python3 scripts/validate-skills.py skills/software-development/skill-lint/SKILL.md
+python3 skills/software-development/skill-lint/scripts/validate-skills.py skills/software-development/skill-lint/SKILL.md
 ```
 
 ### Official Spec Validation
 
 ```bash
-# Will flag Hermes-specific fields (version, author, platforms) as unexpected
-# This is expected — Hermes uses extended format
+# Will flag this repo's extended fields (version, author, platforms) as unexpected
+# This is expected — this repo uses extended format
 skills-ref validate skills/software-development/skill-lint
 ```
 
@@ -135,7 +143,7 @@ skills-ref validate skills/software-development/skill-lint
 
 ```bash
 # Run both validators
-python3 scripts/validate-skills.py skills/software-development/skill-lint/SKILL.md --official
+python3 skills/software-development/skill-lint/scripts/validate-skills.py skills/software-development/skill-lint/SKILL.md --official
 ```
 
 ### CI Integration Test
@@ -148,7 +156,8 @@ python3 scripts/validate-skills.py skills/software-development/skill-lint/SKILL.
 ---
 
 **Validation Scripts:**
-- `scripts/validate-skills.py` — Hermes HARDLINE validator (stdlib only)
+
+- `scripts/validate-skills.py` — HARDLINE validator (stdlib only)
 - `skills-ref` — Official Agent Skills spec validator (requires `click`, `strictyaml`)
 
-**Tests:** `tests/skills/test_skill_lint_skill.py` (10 tests for HARDLINE rules)
+**Tests:** `evals/test_skill_lint_skill.py` (10 tests for HARDLINE rules)

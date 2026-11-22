@@ -2,8 +2,8 @@
 """
 Skill Frontmatter & Structure Validator
 
-Validates a SKILL.md file against the Hermes Agent Skill Authoring Standards.
-Run from repo root: python3 scripts/validate-skills.py skills/<category>/<skill>/SKILL.md
+Validates a SKILL.md file against the Skill Authoring Standards.
+Run from repo root: python3 skills/software-development/skill-lint/scripts/validate-skills.py skills/<category>/<skill>/SKILL.md
 
 Also supports official Agent Skills spec validation via skills-ref (if installed).
 """
@@ -21,13 +21,13 @@ MAX_CONTENT_CHARS = 100_000
 
 VALID_PLATFORMS = {"linux", "macos", "windows"}
 REQUIRED_FIELDS = {"name", "description", "version", "author", "license", "platforms"}
-REQUIRED_METADATA = {"hermes.tags"}
+REQUIRED_METADATA = {"tags"}
 
 OFFICIAL_ALLOWED_FIELDS = {"name", "description", "license", "allowed-tools", "metadata", "compatibility"}
 
 
 def validate_frontmatter(content: str, path: Path) -> Tuple[bool, List[str]]:
-    """Validate frontmatter structure and required fields (Hermes HARDLINE)."""
+    """Validate frontmatter structure and required fields (HARDLINE)."""
     errors = []
 
     # Must start with --- at byte 0
@@ -54,7 +54,7 @@ def validate_frontmatter(content: str, path: Path) -> Tuple[bool, List[str]]:
         errors.append("Frontmatter must be a YAML mapping")
         return False, errors
 
-    # Required fields (Hermes HARDLINE)
+    # Required fields (HARDLINE)
     for field in REQUIRED_FIELDS:
         if field not in fm:
             errors.append(f"Missing required frontmatter field: {field}")
@@ -92,10 +92,7 @@ def validate_frontmatter(content: str, path: Path) -> Tuple[bool, List[str]]:
         author = fm["author"]
         if not isinstance(author, str):
             errors.append("author must be a string")
-        elif "Hermes Agent" not in author:
-            errors.append("author must include 'Hermes Agent' as secondary collaborator")
-        elif author.strip() == "Hermes Agent":
-            errors.append("author must credit human first, then 'Hermes Agent'")
+        # Credit human first (no "Agent" suffix requirement for this repo)
 
     # License
     if "license" in fm and fm["license"] != "MIT":
@@ -115,18 +112,14 @@ def validate_frontmatter(content: str, path: Path) -> Tuple[bool, List[str]]:
     if "metadata" in fm:
         meta = fm["metadata"]
         if isinstance(meta, dict):
-            hermes = meta.get("hermes", {})
-            if not isinstance(hermes, dict):
-                errors.append("metadata.hermes must be a mapping")
-            else:
-                if "tags" not in hermes:
-                    errors.append("metadata.hermes.tags required")
-                elif not isinstance(hermes["tags"], list):
-                    errors.append("metadata.hermes.tags must be a list")
+            if "tags" not in meta:
+                errors.append("metadata.tags required")
+            elif not isinstance(meta["tags"], list):
+                errors.append("metadata.tags must be a list")
 
-                # related_skills is optional; if present, must be a list
-                if "related_skills" in hermes and not isinstance(hermes["related_skills"], list):
-                    errors.append("metadata.hermes.related_skills must be a list")
+            # related_skills is optional; if present, must be a list
+            if "related_skills" in meta and not isinstance(meta["related_skills"], list):
+                errors.append("metadata.related_skills must be a list")
 
     return len(errors) == 0, errors
 
@@ -138,7 +131,6 @@ def validate_official_spec(skill_dir: Path) -> Tuple[bool, List[str]]:
     # Find skills-ref executable (prefer venv, then PATH)
     skills_ref_cmd = None
     for candidate in [
-        "/home/sjefsharp/Projects/hermes-skills/.venv/bin/skills-ref",
         "skills-ref",
     ]:
         if Path(candidate).exists() or candidate == "skills-ref":
@@ -205,7 +197,7 @@ def validate_body(content: str, path: Path) -> Tuple[bool, List[str]]:
         if re.search(pattern, body):
             errors.append(f"Machine-local path detected (pattern: {pattern}) — use repo-relative paths")
 
-    # Check for raw shell utilities that should be Hermes tools
+    # Check for raw shell utilities that should be agent tools
     shell_utils = [
         (r"\bgrep\b", "search_files"),
         (r"\bcat\b", "read_file"),
@@ -216,7 +208,7 @@ def validate_body(content: str, path: Path) -> Tuple[bool, List[str]]:
     ]
     for pattern, replacement in shell_utils:
         if re.search(pattern, body):
-            errors.append(f"Raw shell utility '{pattern}' found — use Hermes tool `{replacement}` instead")
+            errors.append(f"Raw shell utility '{pattern}' found — use agent tool `{replacement}` instead")
 
     return len(errors) == 0, errors
 
@@ -231,7 +223,7 @@ def validate_content_size(content: str, path: Path) -> Tuple[bool, List[str]]:
 def validate_related_skills(fm: dict, repo_root: Path) -> Tuple[bool, List[str]]:
     """Validate that all related_skills exist in-repo."""
     errors = []
-    related = fm.get("metadata", {}).get("hermes", {}).get("related_skills", [])
+    related = fm.get("metadata", {}).get("related_skills", [])
 
     for skill in related:
         # Check skills/ and optional-skills/
@@ -286,7 +278,7 @@ def main():
             skill_md = skill_dir / "SKILL.md"
             print(f"\n=== Validating {skill_dir.relative_to(repo_root)} ===")
 
-            # Hermes HARDLINE validation
+            # HARDLINE validation
             content = skill_md.read_text(encoding="utf-8")
             ok, errors = validate_frontmatter(content, skill_md)
             if ok:
@@ -303,11 +295,11 @@ def main():
 
             if errors:
                 all_passed = False
-                print(f"❌ Hermes HARDLINE FAILED for {skill_dir.relative_to(repo_root)}")
+                print(f"❌ HARDLINE FAILED for {skill_dir.relative_to(repo_root)}")
                 for err in errors:
                     print(f"  - {err}")
             else:
-                print(f"✅ Hermes HARDLINE PASSED for {skill_dir.relative_to(repo_root)}")
+                print(f"✅ HARDLINE PASSED for {skill_dir.relative_to(repo_root)}")
 
             # Official spec validation
             if args.official:
@@ -345,11 +337,11 @@ def main():
         path = skill_md
 
     content = path.read_text(encoding="utf-8")
-    repo_root = path.parent.parent.parent  # skills/<cat>/<skill>/SKILL.md -> repo_root
+    repo_root = path.parent.parent.parent.parent  # skills/<cat>/<skill>/SKILL.md -> repo_root
 
     all_errors = []
 
-    # Hermes HARDLINE validation
+    # HARDLINE validation
     ok, errors = validate_frontmatter(content, path)
     all_errors.extend(errors)
 

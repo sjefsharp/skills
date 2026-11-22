@@ -43,11 +43,11 @@ commit-msg:
 pre-push:
   jobs:
     - name: validate-skills
-      run: python scripts/validate-skills.py --all
+      run: python skills/software-development/skill-lint/scripts/validate-skills.py --all
       stage_fixed: false
 
     - name: tests
-      run: .venv/bin/python -m pytest tests/ -q
+      run: .venv/bin/python -m pytest skills/software-development/skill-lint/evals/ -q
       stage_fixed: false
 
     - name: branch-name

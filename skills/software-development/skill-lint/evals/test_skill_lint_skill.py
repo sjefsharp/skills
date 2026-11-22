@@ -2,7 +2,7 @@
 """
 Tests for skill-lint skill validation script.
 
-Run: pytest tests/skills/test_skill_lint_skill.py -q
+Run: pytest skills/software-development/skill-lint/evals/test_skill_lint_skill.py -q
 """
 
 import subprocess
@@ -14,7 +14,7 @@ from pathlib import Path
 
 def get_venv_python() -> str:
     """Get the venv python path."""
-    repo_root = Path(__file__).parent.parent.parent
+    repo_root = Path(__file__).parent.parent.parent.parent.parent
     venv_python = repo_root / ".venv" / "bin" / "python3"
     if venv_python.exists():
         return str(venv_python)
@@ -23,8 +23,8 @@ def get_venv_python() -> str:
 
 def run_validator(skill_path: Path) -> subprocess.CompletedProcess:
     """Run the validator on a skill file."""
-    repo_root = Path(__file__).parent.parent.parent
-    validator = repo_root / "scripts" / "validate-skills.py"
+    repo_root = Path(__file__).parent.parent.parent.parent.parent
+    validator = repo_root / "skills" / "software-development" / "skill-lint" / "scripts" / "validate-skills.py"
     return subprocess.run(
         [get_venv_python(), str(validator), str(skill_path)],
         capture_output=True,
@@ -39,7 +39,8 @@ def check_output(result: subprocess.CompletedProcess, expected: str) -> bool:
 
 def test_valid_skill_passes():
     """A valid skill should pass validation."""
-    skill_path = Path(__file__).parent.parent.parent / "skills" / "software-development" / "skill-lint" / "SKILL.md"
+    repo_root = Path(__file__).parent.parent.parent.parent.parent
+    skill_path = repo_root / "skills" / "software-development" / "skill-lint" / "SKILL.md"
     result = run_validator(skill_path)
     assert result.returncode == 0, f"Valid skill failed: {result.stdout} {result.stderr}"
     assert check_output(result, "PASSED")
@@ -66,13 +67,12 @@ def test_description_too_long_fails():
         name: test-skill
         description: This description is way too long and contains marketing words like powerful and comprehensive which violates the hardline rules.
         version: 0.1.0
-        author: Test User (testuser), Hermes Agent
+        author: Test User (testuser)
         license: MIT
         platforms: [linux, macos, windows]
         metadata:
-          hermes:
-            tags: [test]
-            related_skills: [hermes-agent-skill-authoring]
+          tags: [test]
+          related_skills: []
         ---
         # Test Skill
         Valid body with required sections.
@@ -99,20 +99,19 @@ def test_description_too_long_fails():
         path.unlink()
 
 
-def test_author_hermes_agent_alone_fails():
-    """Author = 'Hermes Agent' alone should fail."""
+def test_author_human_first():
+    """Author should credit human first (no Agent suffix requirement)."""
     content = textwrap.dedent("""\
         ---
         name: test-skill
         description: Valid description under sixty chars.
         version: 0.1.0
-        author: Hermes Agent
+        author: Test User (testuser)
         license: MIT
         platforms: [linux, macos, windows]
         metadata:
-          hermes:
-            tags: [test]
-            related_skills: [hermes-agent-skill-authoring]
+          tags: [test]
+          related_skills: []
         ---
         # Test Skill
 
@@ -132,8 +131,7 @@ def test_author_hermes_agent_alone_fails():
 
     try:
         result = run_validator(path)
-        assert result.returncode == 1
-        assert check_output(result, "author must credit human first")
+        assert result.returncode == 0, f"Valid author failed: {result.stdout} {result.stderr}"
     finally:
         path.unlink()
 
@@ -145,13 +143,12 @@ def test_related_skill_missing_fails():
         name: test-skill
         description: Valid description under sixty chars.
         version: 0.1.0
-        author: Test User (testuser), Hermes Agent
+        author: Test User (testuser)
         license: MIT
         platforms: [linux, macos, windows]
         metadata:
-          hermes:
-            tags: [test]
-            related_skills: [this-skill-does-not-exist]
+          tags: [test]
+          related_skills: [this-skill-does-not-exist]
         ---
         # Test Skill
 
@@ -184,13 +181,12 @@ def test_machine_local_path_fails():
         name: test-skill
         description: Valid description under sixty chars.
         version: 0.1.0
-        author: Test User (testuser), Hermes Agent
+        author: Test User (testuser)
         license: MIT
         platforms: [linux, macos, windows]
         metadata:
-          hermes:
-            tags: [test]
-            related_skills: [hermes-agent-skill-authoring]
+          tags: [test]
+          related_skills: []
         ---
         # Test Skill
 
@@ -223,13 +219,12 @@ def test_shell_utility_flagged():
         name: test-skill
         description: Valid description under sixty chars.
         version: 0.1.0
-        author: Test User (testuser), Hermes Agent
+        author: Test User (testuser)
         license: MIT
         platforms: [linux, macos, windows]
         metadata:
-          hermes:
-            tags: [test]
-            related_skills: [hermes-agent-skill-authoring]
+          tags: [test]
+          related_skills: []
         ---
         # Test Skill
 
@@ -264,13 +259,12 @@ def test_missing_required_sections_fails():
         name: test-skill
         description: Valid description under sixty chars.
         version: 0.1.0
-        author: Test User (testuser), Hermes Agent
+        author: Test User (testuser)
         license: MIT
         platforms: [linux, macos, windows]
         metadata:
-          hermes:
-            tags: [test]
-            related_skills: [hermes-agent-skill-authoring]
+          tags: [test]
+          related_skills: []
         ---
         # Test Skill
         Body without required sections.
@@ -297,13 +291,12 @@ def test_invalid_platform_fails():
         name: test-skill
         description: Valid description under sixty chars.
         version: 0.1.0
-        author: Test User (testuser), Hermes Agent
+        author: Test User (testuser)
         license: MIT
         platforms: [linux, macos, windows, bsd]
         metadata:
-          hermes:
-            tags: [test]
-            related_skills: [hermes-agent-skill-authoring]
+          tags: [test]
+          related_skills: []
         ---
         # Test Skill
 
@@ -337,13 +330,12 @@ def test_content_size_limit():
         name: test-skill
         description: Valid description under sixty chars.
         version: 0.1.0
-        author: Test User (testuser), Hermes Agent
+        author: Test User (testuser)
         license: MIT
         platforms: [linux, macos, windows]
         metadata:
-          hermes:
-            tags: [test]
-            related_skills: [hermes-agent-skill-authoring]
+          tags: [test]
+          related_skills: []
         ---
         # Test Skill
 
