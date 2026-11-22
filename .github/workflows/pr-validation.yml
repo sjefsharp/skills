@@ -43,7 +43,7 @@ jobs:
 
       - name: Run skill validation (Hermes HARDLINE)
         run: |
-          .venv/bin/python scripts/validate-skills.py --all
+          .venv/bin/python skills/software-development/skill-lint/scripts/validate-skills.py --all
 
   test:
     name: Test Suite
@@ -65,7 +65,7 @@ jobs:
 
       - name: Run tests
         run: |
-          .venv/bin/python -m pytest tests/ -q
+          .venv/bin/python -m pytest skills/software-development/skill-lint/evals/ -q
 
   commitlint:
     name: Commit Message Validation
